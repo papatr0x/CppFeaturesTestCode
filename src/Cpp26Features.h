@@ -2,10 +2,10 @@
 //
 // Created by Patricio Palma on 03-02-25.
 //
+// Visit https://en.cppreference.com/w/cpp/26 for the full list of features in this release.
 
 #ifndef CPP26FEATURES_H
 #define CPP26FEATURES_H
-
 #include "CppFeatures.h"
 
 class Cpp26Features final : public CppFeatures

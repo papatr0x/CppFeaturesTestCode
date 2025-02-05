@@ -2,12 +2,10 @@
 //
 // Created by Patricio Palma on 03-02-25.
 //
+// Visit https://en.cppreference.com/w/cpp/11 for the full list of features in this release.
 
 #ifndef CPP11FEATURES_H
 #define CPP11FEATURES_H
-
-// Visit https://en.cppreference.com/w/cpp/11 for the full list of features in this release.
-
 #include <vector>
 #include "CppFeatures.h"
 #include "Utilities.h"
