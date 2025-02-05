@@ -1,0 +1,21 @@
+// (c) 2025 Patricio Palma C. (patriciop AT gmail)
+//
+// Created by Patricio Palma on 03-02-25.
+//
+
+#ifndef CPP23FEATURES_H
+#define CPP23FEATURES_H
+
+#include "CppFeatures.h"
+
+class Cpp23Features final : public CppFeatures
+{
+public:
+    Cpp23Features() : CppFeatures("C++23") { }
+    void show_features() override
+    {
+        std::cout << "Not yet implemented" << std::endl;
+    }
+};
+
+#endif //CPP23FEATURES_H
