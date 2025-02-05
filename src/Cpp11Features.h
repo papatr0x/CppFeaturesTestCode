@@ -6,19 +6,21 @@
 
 #ifndef CPP11FEATURES_H
 #define CPP11FEATURES_H
+#include <mutex>
+#include <thread>
 #include <vector>
 #include "CppFeatures.h"
 #include "Utilities.h"
 
 // TODO: Pending C++11 features
-//  - threads & locks
 //  - variadic templates
 //  - move semantics std::move
 //  - rvalue references
-//  decltype & decltype(auto)
-//  noexcept
-//  = delete
-//  type deduction rules
+//  - decltype & decltype(auto)
+//  - noexcept
+//  - = delete
+//  - new type deduction rules
+//  - std::async;
 
 // C++11 keyword "final".
 // No class marked as final can be derived.
@@ -36,19 +38,21 @@ class Cpp11Features final : public CppFeatures
     int y = 1;
 
 public:
-    // C++11 keyword "= default"
-    // TODO verify if this allows implement move operator
-    // INFO explain the rule of 6 (or 5 w/o default ctor)
-    ~Cpp11Features() override = default;
-
     // C++11 delegating constructors.
     // This constructor reuses the logic in the custom default constructor while adds more logic.
     explicit Cpp11Features(int j) : Cpp11Features()
     {
-        constexpr auto p = 10; // C++11 new "constexpr" keyword
-        x *= j*p;
+        // C++11 keyword "constexpr"
+        const auto p = 10;
+
+        // C++11 static_assert
         static_assert(p>0, "p is not > 0"); // C++11 static assert
+
+        x *= j*p;
     }
+
+    // C++11 keyword "= default"
+    ~Cpp11Features() override = default;
 
     // C++11 keyword "override"
     // It helps the programmer know when overriding a base class function as not using the keyword generates a warning.
@@ -57,6 +61,8 @@ public:
         ranged_for_loop();
         lambda_function();
         smart_pointers();
+        threads();
+        locks();
     }
 
 private:
@@ -90,6 +96,71 @@ private:
         local_func(10);
     }
 
+    static void thread_payload()
+    {
+        std::cout << "Member function payload started.\n";
+    }
+
+    struct thread_functor
+    {
+        void operator()() const
+        {
+            std::cout << "Functor payload started.\n";
+        }
+    };
+
+    void threads() const
+    {
+        print_title(__func__);
+
+        // C++11 instantiate a thread with static member function as payload
+        std::thread memberFunctionThread(Cpp11Features::thread_payload);
+
+        // C++11 wait for the thread to join (to finish) to continue.
+        memberFunctionThread.join();
+
+        std::thread functorThread{thread_functor()};
+        functorThread.join();
+
+        std::thread lambdaThread{[]{ std::cout << "Lambda payload started.\n";}};
+        lambdaThread.join();
+    }
+
+    void locks() const
+    {
+        print_title(__func__);
+
+        // C++11 std::mutex
+        // This will control access to counter variable.
+        std::mutex mutex;
+        int counter = 0;
+
+        // Threads will increase an external counter on the value of the delta provided
+        auto payload = [&mutex](int& counter, const int delta)
+        {
+          for (int i = 0; i<5; ++i)
+          {
+              std::lock_guard g(mutex);
+              counter += delta;
+              std::cout << "delta=" << delta << " counter=" << counter << '\n';
+          }
+        };
+
+        // C++11 std::array
+        // This is a array of 10 null threads.
+        std::array<std::thread, 10> threads;
+
+        // launch the requested threads
+        for (int i = 0; i < threads.size(); ++i)
+        {
+             threads[i] = std::thread(payload, std::ref(counter), i+1);
+        }
+
+        // wait for all threads to finish.
+        for (auto& thread : threads) { thread.join(); }
+        std::cout << "outer counter=" << counter << '\n';
+    }
+
     void smart_pointers()
     {
         print_title(__func__);
@@ -97,8 +168,7 @@ private:
         // The old raw pointer but this time they know their business (create and destroy the object) and
         // do it on behalf of the programmer.
 
-        // std::unique_ptr<> is a single owner ptr. It cannot be copied but moved.
-
+        // std::unique_ptr<> is a single owner ptr.
         std::unique_ptr<Dummy> outerDummy;
         {
             // std::shared_ptr<> this uses a reference counter to a specific object,  multiple shared_ptr<> object
@@ -111,6 +181,10 @@ private:
             smart_pointers_test("Scope 1");
 
             auto up = std::make_unique<Dummy>("unique ptr example");
+
+            // std::unique_ptr<> are non-copiable objects but moveable. If a unique_ptr<> could be copied, the single
+            // owner rule would fail, this is two std::unique_ptr<> would reference the same object. By moving the
+            // std::unique_ptr<> this error avoided, in every time there is always only one ptr.
             outerDummy = std::move(up); // C++11 std::move
         }
         smart_pointers_test("Scope 2");
