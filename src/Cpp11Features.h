@@ -6,6 +6,7 @@
 
 #ifndef CPP11FEATURES_H
 #define CPP11FEATURES_H
+#include <array>
 #include <future>
 #include <mutex>
 #include <thread>
