@@ -23,7 +23,8 @@ If you are an expert programmer, this will probably be boring.
 I have tested this with:
 - Apple clang version 16.0.0 (clang-1600.0.26.6)
 - Homebrew clang version 19.1.7
-- (not verified yet) Microsoft C++ Compiler
+- Microsoft (R) C/C++ Optimizing Compiler Version 19.38.33144 for x64
+- CLion bundled MinGW 11.0 w64
 
 ## How to Build ##
 On console
@@ -36,4 +37,4 @@ The resulting code can be executed with
 
 ## Notes ##
 The zero warnings policy is a must, but in this project, as a special case some warnings are
-expected (i.e. to demostrate [[nodiscard]] attribute.)
+expected (i.e. to demonstrate [[nodiscard]] attribute.)
