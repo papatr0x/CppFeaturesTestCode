@@ -19,8 +19,8 @@
 //  - decltype & decltype(auto)
 //  - noexcept
 //  - = delete
-//  - new type deduction rules
-//  - std::async;
+//  - new type deduction rules (for C++11)
+//  - std::async, std::future, std::promise
 
 // C++11 keyword "final".
 // No class marked as final can be derived.
@@ -43,7 +43,7 @@ public:
     explicit Cpp11Features(int j) : Cpp11Features()
     {
         // C++11 keyword "constexpr"
-        const auto p = 10;
+        constexpr  auto p = 10;
 
         // C++11 static_assert
         static_assert(p>0, "p is not > 0"); // C++11 static assert
@@ -140,24 +140,28 @@ private:
         {
           for (int i = 0; i<5; ++i)
           {
-              std::lock_guard g(mutex);
+              std::lock_guard<std::mutex> g(mutex);
               counter += delta;
               std::cout << "delta=" << delta << " counter=" << counter << '\n';
           }
         };
 
         // C++11 std::array
-        // This is a array of 10 null threads.
+        // This is an array of 10 null threads.
         std::array<std::thread, 10> threads;
 
         // launch the requested threads
         for (int i = 0; i < threads.size(); ++i)
         {
-             threads[i] = std::thread(payload, std::ref(counter), i+1);
+            // std::ref is required when passing references to a thread payload, as payload
+            // arguments are copied into the thread storage area.
+            threads[i] = std::thread(payload, std::ref(counter), i+1);
         }
 
         // wait for all threads to finish.
         for (auto& thread : threads) { thread.join(); }
+
+        // present results
         std::cout << "outer counter=" << counter << '\n';
     }
 
