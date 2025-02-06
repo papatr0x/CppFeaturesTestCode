@@ -6,6 +6,7 @@
 
 #ifndef CPP11FEATURES_H
 #define CPP11FEATURES_H
+#include <future>
 #include <mutex>
 #include <thread>
 #include <vector>
@@ -20,7 +21,7 @@
 //  - noexcept
 //  - = delete
 //  - new type deduction rules (for C++11)
-//  - std::async, std::future, std::promise
+//  - std::promise
 
 // C++11 keyword "final".
 // No class marked as final can be derived.
@@ -63,6 +64,7 @@ public:
         smart_pointers();
         threads();
         locks();
+        futures();
     }
 
 private:
@@ -209,6 +211,39 @@ private:
     // While it is a pointer, it works as a regular object. You do not need
     // to check for null before dereferencing
     std::weak_ptr<Dummy> weakPtr; // C++11 std::weak_ptr
+
+    [[nodiscard]] float futures_payload(const int i) const
+    {
+        std::cout << "Futures payload started. i=" << i << '\n';
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        return static_cast<float>(i)  * 0.79f;
+    }
+
+    void futures() const
+    {
+        print_title(__func__);
+
+        // C++11 std::async/std::future provides a mechanism to execute asynchronous task potentially
+        // as a new thread, that is up to the std::launch policy defined.
+        // std::async handles thread instantiation, termination, and exception handling at the cost of less control
+        // on the task thread and execution order.
+
+        // std::launch::async : task is executed in a different thread (potentially creating and launching a new thread)
+        // std::launch::deferred : task is executed on the calling thread the first time the result is requested.
+
+        std::future<float> asyncTask1 = std::async(std::launch::async, &Cpp11Features::futures_payload, this, 1);
+
+        std::future<float> asyncTask2 = std::async(std::launch::deferred, &Cpp11Features::futures_payload, this, 2);
+
+        std::future<int> asyncTask3   = std::async([](){
+            std::cout << "Lambda payload started.\n";
+            return 7;
+        });
+
+        std::cout << "asyncTask1=" << asyncTask1.get() << '\n';
+        std::cout << "asyncTask2=" << asyncTask2.get() << '\n';
+        std::cout << "asyncTask3=" << asyncTask3.get() << '\n';
+    }
 };
 
 #endif //CPP11FEATURES_H
