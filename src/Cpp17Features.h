@@ -46,20 +46,20 @@ private:
         {
             std::cout << "structured binding, partial\n";
             const auto& [a,_,c] = sb_test_struct();
-            std::cout << "a=" << a << " c=" << c << " b assigned to _" << std::endl;
+            std::cout << "a=" << a << " c=" << c << " b assigned to _" << '\n';
         }
         {
             std::cout << "structured binding, mutable member\n";
             const auto& [a, b, c] = sb_test_struct{0, "bye", false};
             a = 100;
-            std::cout << "a=" << a << " b=" << b << std::endl;
+            std::cout << "a=" << a << " b=" << b << '\n';
         }
         {
             std::cout << "structured binding, to an array\n";
             int a[2] = {1, 2};
-            std::cout << format_array(a) << std::endl;
+            std::cout << format_array(a) << '\n';
             auto [x, y] = a;
-            std::cout << "x=" << x << " y=" << y << std::endl;
+            std::cout << "x=" << x << " y=" << y << '\n';
         }
     }
 
@@ -102,17 +102,18 @@ private:
     void std_optional() const
     {
         print_title(__func__);
+
         std_optional_argument(std::nullopt);
         std_optional_argument(100);
         for (const auto value : {true, false})
         {
             if (const auto& returned_value = std_optional_return(value))
             {
-                std::cout << "returned value=" << *returned_value << std::endl;
+                std::cout << "returned value=" << *returned_value << '\n';
             }
             else
             {
-                std::cout << "returned value=std::nullopt" << std::endl;
+                std::cout << "returned value=std::nullopt" << '\n';
             }
         }
     }
@@ -120,43 +121,55 @@ private:
     void std_variant() const
     {
         print_title(__func__);
-        std::variant<int, std::string, bool> variant;
-        variant = true;
 
-        std::cout << "variant is storing a bool true\n";
-        std::cout << "variant=" << std::get<bool>(variant) << std::endl;
+        // C++17 std::variant
+        // This is the evolution of unions. An object of this class can contains a value of any type specified
+        // in the template. Below variable "variant" can contain either an int, a std::string or a bool value.
+        // In case of error, a variant object can be valueless.
+        std::variant<int, std::string, bool> variant = true;
         try
         {
-            std::cout << "variant=" << std::get<std::string>(variant) << std::endl;
+            std::cout << "get by type        variant=" << std::get<bool>(variant) << '\n';     // OK
+            std::cout << "get by index       variant=" << std::get<2>(variant) << '\n';        // OK
+            std::cout << "get by std::string (throws) variant=" << std::get<std::string>(variant) << '\n'; // This throws.
         }
         catch (const std::bad_variant_access& e)
         {
-            std::cout << e.what() << std::endl;
+            std::cout << "variant do not contains std::string\n";
+            std::cout << e.what() << '\n';
         }
 
+        // you can check for specific type availability with std::holds_alternative<T>(variant)
         if (!std::holds_alternative<std::string>(variant))
         {
             std::cout << "variant does not holds a std::string type\n";
         }
-        std::visit([](auto&& value) { std::cout << "std::visit " << value << "\n"; }, variant);
+
+        // the recommended way to look for the available type is to use std::visit which is safer.
+        std::visit([](auto&& value) { std::cout << "std::visit " << value << '\n'; }, variant);
     }
 
     void if_switch_initializers() const
     {
         print_title(__func__);
-        // some_value do not exist here
+
+        // C++17 if initializer -- if (initializer; expr) { ...
+        // variable defined in init section are available into if and else blocks.
         if (const int some_value = 0; some_value != 0)
         {
+            // some_value exists here
             std::cout << "This is NOT displayed some_value=" << some_value << std::endl;
         }
         else
         {
+            // some_value exists here too
             std::cout << "This is displayed some_value=" << some_value << std::endl;
         }
-        // some_value do not exist here
+        // some_value do NOT exist here
 
         std::cout << "switch initializer example\n";
         auto get_a_value = []() -> int { return 1; };
+        // C++17 switch initializer. Works the same as if initializer.
         switch (int some_value = get_a_value(); some_value)
         {
         case 1:
@@ -171,23 +184,29 @@ private:
     void std_any() const
     {
         print_title(__func__);
+
+        // C++17 std::any
+        // It is a type safe container for copy constructible type.
+        // std::any adds flexibility at the cost of using std::any_cast which has to be explicit
         std::any variable;
-        std::cout << "variable has_value=" << std::boolalpha << variable.has_value() << std::endl;
+        std::cout << "variable has_value=" << std::boolalpha << variable.has_value() << '\n';
+
         variable = 3.14;
-        std::cout << "variable has_value=" << std::boolalpha << variable.has_value() << std::endl;
-        std::cout << "variable has type " << variable.type().name() << std::endl;
-        std::cout << "variable=" << std::any_cast<double>(variable) << std::endl;
+        std::cout << "variable has_value=" << std::boolalpha << variable.has_value() << '\n';
+        std::cout << "variable has type " << variable.type().name() << '\n';
+        std::cout << "variable=" << std::any_cast<double>(variable) << '\n';
 
         variable = std::string("mary jane");
-        std::cout << "variable has_value=" << std::boolalpha << variable.has_value() << std::endl;
-        std::cout << "variable has type " << variable.type().name() << std::endl;
-        std::cout << "variable=" << std::any_cast<std::string>(variable) << std::endl;
+        std::cout << "variable has_value=" << std::boolalpha << variable.has_value() << '\n';
+        std::cout << "variable has type " << variable.type().name() << '\n';
+        std::cout << "variable=" << std::any_cast<std::string>(variable) << '\n';
 
         try {
+            // this will throw
             std::cout << "variable=" << std::any_cast<float>(variable) << std::endl;
         }
         catch (std::bad_any_cast& e) {
-            std::cout << e.what() << std::endl;
+            std::cout << e.what() << '\n';
             std::cout << "failed to get float of a variant\n";
         }
     }
@@ -195,7 +214,8 @@ private:
     void std_string_view() const
     {
         print_title(__func__);
-        std::string str = "   trim me";
+
+        const std::string str = "   trim me";
         std::string_view v = str;
         v.remove_prefix(std::min(v.find_first_not_of(' '), v.size()));
         std::cout << "base string=" << str << '\n'
@@ -208,8 +228,14 @@ private:
         const std::string path = "."; // current directory
 
         try {
-            for (const auto& entry : std::filesystem::directory_iterator(path)) {
+            int i = 0;
+            for (const auto& entry : std::filesystem::directory_iterator(path))
+            {
                 std::cout << entry.path() << '\n';
+                if ( ++i >= 5)
+                {
+                    break;
+                }
             }
         }
         catch (const std::filesystem::filesystem_error& e) {
