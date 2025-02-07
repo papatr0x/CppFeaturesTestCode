@@ -21,7 +21,6 @@
 //  - decltype & decltype(auto)
 //  - noexcept
 //  - = delete
-//  - new type deduction rules (for C++11)
 //  - std::promise
 
 // C++11 keyword "final".
