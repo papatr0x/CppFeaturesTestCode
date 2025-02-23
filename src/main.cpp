@@ -15,7 +15,7 @@
 
 int main()
 {
-    Cpp11Features cpp11(77);
+    Cpp11Features cpp11;
     cpp11.show_features();
 
     Cpp14Features cpp14;

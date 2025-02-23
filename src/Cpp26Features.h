@@ -14,7 +14,7 @@ public:
     Cpp26Features() : CppFeatures("C++26") { }
     void show_features() override
     {
-        std::cout << "Not yet implemented. Probably it is a little to early for that." << std::endl;
+        std::cout << "Not yet implemented. Probably it is a little too soon for that.\n";
     }
 };
 

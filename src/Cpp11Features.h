@@ -9,6 +9,7 @@
 #include <array>
 #include <future>
 #include <mutex>
+#include <numeric>
 #include <thread>
 #include <vector>
 #include "CppFeatures.h"
@@ -21,18 +22,11 @@
 //  - decltype & decltype(auto)
 //  - noexcept
 //  - = delete
-//  - std::promise
 
 // C++11 keyword "final".
 // No class marked as final can be derived.
 class Cpp11Features final : public CppFeatures
 {
-    Cpp11Features() : CppFeatures("C++11")
-    {
-        // x and y members where already initialized on declaration
-        x = y = 7;
-    }
-
     // C++11 in-class members initializer.
     // Initial values for class properties can be stated directly in class declaration
     int x = 1;
@@ -41,15 +35,18 @@ class Cpp11Features final : public CppFeatures
 public:
     // C++11 delegating constructors.
     // This constructor reuses the logic in the custom default constructor while adds more logic.
-    explicit Cpp11Features(int j) : Cpp11Features()
+    Cpp11Features() : CppFeatures("C++11")
     {
         // C++11 keyword "constexpr"
-        constexpr  auto p = 10;
+        constexpr auto p = 10;
 
         // C++11 static_assert
+        // if the condition is not true, then assert will throw a compilation error.
         static_assert(p>0, "p is not > 0"); // C++11 static assert
 
-        x *= j*p;
+        x = y = 7;
+
+        x *= p;
     }
 
     // C++11 keyword "= default"
@@ -57,7 +54,9 @@ public:
 
     // C++11 keyword "override"
     // It helps the programmer know when overriding a base class function as not using the keyword generates a warning.
-    void show_features() override
+    // C++11 keyword "final"
+    // Marks this function as a final override.
+    void show_features() final override
     {
         ranged_for_loop();
         lambda_function();
@@ -65,6 +64,7 @@ public:
         threads();
         locks();
         futures();
+        promise();
     }
 
 private:
@@ -235,7 +235,7 @@ private:
 
         std::future<float> asyncTask2 = std::async(std::launch::deferred, &Cpp11Features::futures_payload, this, 2);
 
-        std::future<int> asyncTask3   = std::async([](){
+        std::future<int> asyncTask3 = std::async([](){
             std::cout << "Lambda payload started.\n";
             return 7;
         });
@@ -243,6 +243,39 @@ private:
         std::cout << "asyncTask1=" << asyncTask1.get() << '\n';
         std::cout << "asyncTask2=" << asyncTask2.get() << '\n';
         std::cout << "asyncTask3=" << asyncTask3.get() << '\n';
+    }
+
+    void promiseWorkerImplementation(const std::vector<std::string>::const_iterator begin,
+                               const std::vector<std::string>::const_iterator end, std::promise<std::string> thePromise) const
+    {
+        using namespace std::string_literals;
+        auto sep = [](const std::string& a, const std::string& b) {
+            return a + "-" + b;
+        };
+        const std::string result = std::accumulate(std::next(begin), end, *begin, sep);
+        thePromise.set_value(result);
+    }
+
+    void promise() const
+    {
+        // C++11 std::promise
+        // is a provider(or creator) for the shared state that std::future access to read the provided result.
+        // std::async is a high level convenience that creates the provider (then the state), and the result object.
+
+        // Create the provider object for the shared state. State is created here.
+        std::promise<std::string> thePromise;
+
+        // Let's get a result object.
+        std::future<std::string> theFuture = thePromise.get_future();
+
+        // launch the task (simulate std::async)
+        std::vector<std::string> severalStrings = {"the", "quick", "brown", "fox","jumped", "over", "the", "lazy", "dog "};
+        std::thread workerThread(&Cpp11Features::promiseWorkerImplementation, this,  severalStrings.cbegin(), severalStrings.cend(), std::move(thePromise));
+        // thePromise do not lives here anymore.
+
+        std::cout << "theFuture=" << theFuture.get() << '\n';
+        // While execution stopped in theFuture.get(), join() has to be called (and avoid a crashing) (use jthread if possible).
+        workerThread.join();
     }
 };
 
