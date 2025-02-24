@@ -19,13 +19,14 @@ If you are an expert programmer, this will probably be boring.
 
 ## Requirements ##
 - CMake 3.20 minimum required.
-- C++ compiler
+- C++ compiler (i.e. clang or other)
 
 I have tested this with:
 - Apple clang version 16.0.0 (clang-1600.0.26.6)
 - Homebrew clang version 19.1.7
 - Microsoft (R) C/C++ Optimizing Compiler Version 19.38.33144 for x64
 - CLion bundled MinGW 11.0 w64
+- g++-14 (Homebrew GCC 14.2.0_1) 14.2.0
 
 ## How to compile the examples ##
 On the console (Linux, Windows, macOS)
