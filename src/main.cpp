@@ -1,4 +1,4 @@
-// (c) 2025 Patricio Palma C. (patriciop AT gmail)
+// (c) 2025 Patricio Palma (ppalma.dev@protonmail.com)
 
 // This is intended to practice/remeber just some of the "new" C++ Features, starting from C++11
 // until C++23 (or C++26 maybe).
@@ -30,8 +30,8 @@ int main()
     Cpp23Features cpp23;
     cpp23.show_features();
 
-    Cpp26Features cpp26;
-    cpp26.show_features();
+    // Cpp26Features cpp26;
+    // cpp26.show_features();
 
     return 0;
 }

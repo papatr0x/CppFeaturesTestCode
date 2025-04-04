@@ -1,4 +1,4 @@
-# (c) 2025 Patricio Palma C. (patriciop AT gmail)
+# (c) 2025 Patricio Palma (ppalma.dev@protonmail.com)
 cmake_minimum_required(VERSION 3.20)
 project(CppFeaturesTestCode)
 

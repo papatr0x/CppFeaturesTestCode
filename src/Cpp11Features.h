@@ -1,4 +1,4 @@
-// (c) 2025 Patricio Palma C. (patriciop AT gmail)
+// (c) 2025 Patricio Palma (ppalma.dev@protonmail.com)
 //
 // Created by Patricio Palma on 03-02-25.
 //
@@ -259,8 +259,8 @@ private:
     void promise() const
     {
         // C++11 std::promise
-        // is a provider(or creator) for the shared state that std::future access to read the provided result.
-        // std::async is a high level convenience that creates the provider (then the state), and the result object.
+        // This is a shared state provider, this state contains the result accessed by std::future.
+        // std::async is a high level convenience that creates the state provider, the state and the result object.
 
         // Create the provider object for the shared state. State is created here.
         std::promise<std::string> thePromise;
@@ -269,12 +269,12 @@ private:
         std::future<std::string> theFuture = thePromise.get_future();
 
         // launch the task (simulate std::async)
-        std::vector<std::string> severalStrings = {"the", "quick", "brown", "fox","jumped", "over", "the", "lazy", "dog "};
+        const std::vector<std::string> severalStrings = {"the", "quick", "brown", "fox","jumped", "over", "the", "lazy", "dog "};
         std::thread workerThread(&Cpp11Features::promiseWorkerImplementation, this,  severalStrings.cbegin(), severalStrings.cend(), std::move(thePromise));
         // thePromise do not lives here anymore.
 
         std::cout << "theFuture=" << theFuture.get() << '\n';
-        // While execution stopped in theFuture.get(), join() has to be called (and avoid a crashing) (use jthread if possible).
+        // While execution stopped in theFuture.get(), join() still needs to be called (and avoid a crashing) (use jthread if possible).
         workerThread.join();
     }
 };

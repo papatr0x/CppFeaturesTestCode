@@ -1,4 +1,4 @@
-// (c) 2025 Patricio Palma C. (patriciop AT gmail)
+// (c) 2025 Patricio Palma (ppalma.dev@protonmail.com)
 //
 // Created by Patricio Palma on 03-02-25.
 //
@@ -9,8 +9,10 @@
 #include "CppFeatures.h"
 
 // TODO
-//  std::exchange
-
+// std::make_unique
+// std::shared_timed_mutex and std::shared_lock
+// std::integer_sequence
+// std::quoted
 class Cpp14Features final : public CppFeatures
 {
 public:
@@ -22,6 +24,7 @@ public:
         return_type_deduction();
         binary_literals();
         digits_separators();
+        library_features();
     }
 
 private:
@@ -62,6 +65,16 @@ private:
     {
         print_title(__func__);
         std::cout << "This literal was written as 1'000'000 with value " << 1'000'000 << std::endl;
+    }
+
+    void library_features() const
+    {
+        print_title(__func__);
+
+        int a=1, b=2, r=0;
+        std::cout << "r=" << r <<  " a=" << a << " b=" << b << '\n';
+        r = std::exchange(a, b);
+        std::cout << "r=" << r <<  " a=" << a << " b=" << b << '\n';
     }
 
 /*
