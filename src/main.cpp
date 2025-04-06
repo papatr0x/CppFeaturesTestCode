@@ -1,4 +1,4 @@
-// (c) 2025 Patricio Palma (ppalma.dev@protonmail.com)
+// (c) 2025 Patricio Palma (ppalma.dev AT protonmail.com)
 
 // This is intended to practice/remeber just some of the "new" C++ Features, starting from C++11
 // until C++23 (or C++26 maybe).

@@ -1,4 +1,4 @@
-// (c) 2025 Patricio Palma (ppalma.dev@protonmail.com)
+// (c) 2025 Patricio Palma (ppalma.dev AT protonmail.com)
 //
 // Created by Patricio Palma on 03-02-25.
 //
